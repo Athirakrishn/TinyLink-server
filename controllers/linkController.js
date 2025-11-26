@@ -80,3 +80,28 @@ exports.deleteUrlController = async (req, res) => {
     res.status(500).json(err);
   }
 };
+
+
+// REDIRECT CONTROLLER
+exports.redirectController = async (req, res) => {
+  const { code } = req.params;
+
+  try {
+    const link = await links.findOne({ shortCode: code });
+
+    if (!link) {
+      return res.status(404).send("Short URL not found");
+    }
+
+    // update stats
+    link.totalClicks += 1;
+    link.lastClicked = new Date();
+    await link.save();
+
+    return res.redirect(link.originalUrl);
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

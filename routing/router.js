@@ -14,6 +14,8 @@ router.get('/api/links/:code',linkController.statsController)
 // DELETE  Delete link
 router.delete('/api/links/:code',linkController.deleteUrlController)
 
+//redirect
+router.get('/:code', linkController.redirectController);
 
 
 module.exports = router
