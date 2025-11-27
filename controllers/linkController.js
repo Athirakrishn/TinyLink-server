@@ -54,6 +54,8 @@ exports.statsController = async (req, res) => {
     if (!link) {
       return res.status(404).json({ message: "Link not found" });
     }
+   link.totalClicks += 1;
+    link.lastClicked = new Date();
 
     res.status(200).json({
       originalUrl: link.originalUrl,
@@ -81,8 +83,7 @@ exports.deleteUrlController = async (req, res) => {
   }
 };
 
-
-// REDIRECT CONTROLLER
+//redirect
 exports.redirectController = async (req, res) => {
   const { code } = req.params;
 
@@ -90,18 +91,19 @@ exports.redirectController = async (req, res) => {
     const link = await links.findOne({ shortCode: code });
 
     if (!link) {
-      return res.status(404).send("Short URL not found");
+      return res.status(404).json({ message: "Short URL not found" });
     }
 
-    // update stats
+    // Increment clicks
     link.totalClicks += 1;
     link.lastClicked = new Date();
+
     await link.save();
 
     return res.redirect(link.originalUrl);
 
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Internal server error" });
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 };
